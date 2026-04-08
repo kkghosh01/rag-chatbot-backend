@@ -19,8 +19,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "https://rag-chatbot-backend-cipn.onrender.com",
+    "http://localhost:5173",
+    "https://web-production-af007.up.railway.app",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
