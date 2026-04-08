@@ -19,16 +19,18 @@ app = FastAPI()
 # React থেকে request আসতে দেওয়ার জন্য
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://rag-chatbot-backend-cipn.onrender.com",  
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Global state
 vectorstore = None
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+embeddings = None
+
 llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
 
 prompt = ChatPromptTemplate.from_template("""
@@ -46,7 +48,12 @@ def format_docs(docs):
 
 @app.on_event("startup")
 async def startup_event():
-    global vectorstore
+    global vectorstore, embeddings
+    
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    
     if os.path.exists("restaurant_guide.pdf"):
         loader = PyPDFLoader("restaurant_guide.pdf")
         documents = loader.load()
