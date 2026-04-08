@@ -7,7 +7,6 @@ langchain-community
 langchain-text-splitters
 faiss-cpu
 pypdf
-sentence-transformers
+fastembed
 python-dotenv
 pydantic
-torch --index-url https://download.pytorch.org/whl/cpu

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -55,9 +55,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     global vectorstore, embeddings
 
     if embeddings is None:
-        embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
+        embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         content = await file.read()
@@ -78,9 +76,7 @@ async def ask_question(request: QuestionRequest):
     global vectorstore, embeddings
 
     if embeddings is None:
-        embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
+        embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
     if vectorstore is None:
         if os.path.exists("restaurant_guide.pdf"):
@@ -93,10 +89,12 @@ async def ask_question(request: QuestionRequest):
             return {"answer": "আগে একটা PDF upload করুন।"}
 
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
     chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
         | prompt
         | llm
     )
+
     response = chain.invoke(request.question)
     return {"answer": response.content}
