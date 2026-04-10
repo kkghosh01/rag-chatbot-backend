@@ -19,7 +19,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:5173",
+    "https://rag-chatbot-frontend-plum.vercel.app",
     "https://web-production-af007.up.railway.app",
     ],
     allow_methods=["*"],
